@@ -1,0 +1,9 @@
+.idea/*
+build/*
+dist/*
+output/*
+BandCombination.xlsx
+__pycache__/*
+UECapabilityInformatio*.txt
+cmd.exe.lnk
+
