@@ -16,8 +16,6 @@ isWindows = False
 def showOption():
     print("   --help    | -h  --> Show this message")
     print("   --output  | -o  --> Store output file in output folder")
-    print("   --country | -c  --> Set Country (to be used with DB)")
-    print("   --model   | -m  --> Set Model Name, starting with 'SM-' (to be used with DB)")
     print(" NOTE: when using -c and -m options, file MUST be provided")
 
 def showHelp():
@@ -39,10 +37,6 @@ if __name__ == '__main__':
                 if option.find("--output") != -1 or option.find("-o") != -1:
                     createOutDir = True
                     break
-                elif option.find("--country") != -1 or option.find("-c") != -1:
-                    country = sys.argv[i+1]
-                elif option.find("--model") != -1 or option.find("-m") != -1:
-                    modelName = sys.argv[i+1]
                 else:
                     print("Invalid argument. Current supported options are:")
                     showOption()
@@ -81,12 +75,8 @@ if __name__ == '__main__':
     lines = file.readlines()
     file.close()
 
-    if modelName == "" or country == "":
-        #main program without DB storage
-        Parser.readInformation(lines, outFile)
-    else:
-        #main program with DB storage
-        Parser.readInformation(lines, outFile, country, modelName)
+    #main program without DB storage
+    Parser.readInformation(lines, outFile)
 
    #If option --output was passed, it will store the output file in the output directory
     if createOutDir:

@@ -1,4 +1,3 @@
-import DBlib
 
 #Calculate number of layers based on number of antennas and BW class
 def calculateLayers(layers,mimo,bwClass):
@@ -110,12 +109,3 @@ def convertInStruct(bandList):
             bandCombination.append(bandElement)
         bandCombinationList.append(bandCombination)
     return bandCombinationList
-
-
-def writeOnDB(country, model, bandsList, bandCombinationList, bcsList, modulationList):
-    for band,modulation in zip(bandsList,modulationList):
-        DBlib.saveBandModulation(country, model, band, 'Y' if modulation['dl-256QAM-r12'] == "supported" else 'N', 'Y' if modulation['ul-64QAM-r12'] == "supported" else 'N')
-    if bandCombinationList != ['None']:
-        combo = convertInLine(bandCombinationList)
-        for comboItem,bcsItem in zip(combo, bcsList):
-            DBlib.saveBandCombination(country, model, comboItem, bcsItem)

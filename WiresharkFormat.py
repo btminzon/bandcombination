@@ -1,7 +1,6 @@
 
 import ExcelHandler
 import UtilsLib
-import DBlib
 
 print_console = False
 
@@ -361,7 +360,7 @@ def parseHighOrderModulationWiresharkFormat(lines):
 
 
 #************* Called from main loop. This method will call all other parsers and will store data in DB*****************
-def parseWiresharkFormat(lines,fileName,country,modelName):
+def parseWiresharkFormat(lines,fileName):
     #Parse supported LTE bands
     parseSupportedBandsWiresharkFormat(lines)
 
@@ -373,10 +372,6 @@ def parseWiresharkFormat(lines,fileName,country,modelName):
 
     #Parse support for 256QAM in DL and 64QAM in UL
     parseHighOrderModulationWiresharkFormat(lines)
-
-    if country != None and modelName != None:
-        #Prepare data to write on DB
-        UtilsLib.writeOnDB(country, modelName, bandsList, bandCombinationList, bcsList, modulationList)
 
     # write table on Excel
     ExcelHandler.write2Excel(bandsList, bandCombinationList, layersList, bcsList, modulationList, fileName)

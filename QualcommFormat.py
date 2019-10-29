@@ -383,7 +383,7 @@ def parseHighOrderModulationQualcommFormat(lines):
 
 
 #************* Called from main loop. This method will call all other parsers and will store data in DB*****************
-def parseQualcommFormat(lines,fileName,country,modelName):
+def parseQualcommFormat(lines, fileName):
     #Parse supported LTE bands
     parseSupportedBandsQualcommFormat(lines)
 
@@ -395,10 +395,6 @@ def parseQualcommFormat(lines,fileName,country,modelName):
 
     #parse support for 256QAM in DL and 64QAM in UL
     parseHighOrderModulationQualcommFormat(lines)
-
-    if country != None and modelName != None:
-        #Prepare data to write on DB
-        UtilsLib.writeOnDB(country, modelName, bandsList, bandCombinationList, bcsList, modulationList)
 
     #write table on Excel
     ExcelHandler.write2Excel(bandsList, bandCombinationList, layersList, bcsList, modulationList, fileName)
