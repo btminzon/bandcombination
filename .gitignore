@@ -2,7 +2,7 @@
 build/*
 dist/*
 output/*
-BandCombination.xlsx
+*.xlsx
 __pycache__/*
 UECapabilityInformatio*.txt
 cmd.exe.lnk

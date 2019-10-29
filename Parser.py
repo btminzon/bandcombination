@@ -1,16 +1,28 @@
 import WiresharkFormat
 import QualcommFormat
+import TEMSFormat
 
 def readInformation(text, fileName, country=None, modelName=None):
     wiresharkFormat = False
+    temsFormat = False
+    checkNextLine = False
     for supportedBands in text:
-        if supportedBands.find("supportedBandListEUTRA :") != -1:
+        if supportedBands.find("supportedBandListEUTRA:") != -1:
             wiresharkFormat = True
             break
+        elif checkNextLine:
+            if supportedBands.find("SupportedBandListEUTRA :") != -1:
+                temsFormat = True
+                break
+            else: # Qualcomm format was found
+                wiresharkFormat = False
+                break
         elif supportedBands.find("supportedBandListEUTRA") != -1:
-            wiresharkFormat = False
-            break
+            checkNextLine = True
+
     if wiresharkFormat:
-        WiresharkFormat.parseWiresharkFormat(text,fileName,country,modelName)
+        WiresharkFormat.parseWiresharkFormat(text, fileName, country, modelName)
+    elif temsFormat:
+        TEMSFormat.parseTEMSFormat(text, fileName, country, modelName)
     else:
-        QualcommFormat.parseQualcommFormat(text,fileName,country,modelName)
+        QualcommFormat.parseQualcommFormat(text, fileName, country, modelName)
