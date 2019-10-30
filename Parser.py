@@ -21,8 +21,8 @@ def readInformation(text, fileName, country=None, modelName=None):
             checkNextLine = True
 
     if wiresharkFormat:
-        WiresharkFormat.parseWiresharkFormat(text, fileName, country, modelName)
+        WiresharkFormat.parseWiresharkFormat(text, fileName)
     elif temsFormat:
-        TEMSFormat.parseTEMSFormat(text, fileName, country, modelName)
+        TEMSFormat.parseTEMSFormat(text, fileName)
     else:
-        QualcommFormat.parseQualcommFormat(text, fileName, country, modelName)
+        QualcommFormat.parseQualcommFormat(text, fileName)
