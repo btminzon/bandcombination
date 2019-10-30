@@ -7,8 +7,6 @@ import Parser
 fileName = ""
 file = ""
 outFile = ""
-country = ""
-modelName = ""
 
 createOutDir = False
 isWindows = False
@@ -16,10 +14,9 @@ isWindows = False
 def showOption():
     print("   --help    | -h  --> Show this message")
     print("   --output  | -o  --> Store output file in output folder")
-    print(" NOTE: when using -c and -m options, file MUST be provided")
 
 def showHelp():
-    print("\n      UE Capability Information Parser v0.1")
+    print("\n      UE Capability Information Parser v0.2")
     print("Written by Breno T. Minzon - breno.minzon@gmail.com")
     print("Usage:")
     print("       UECapabilityInformation <option> <filename>")
