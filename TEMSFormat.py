@@ -273,9 +273,10 @@ def parseBandwidthCombinationSetTEMSFormat(fileLines):
             if fileLines[i+1].find("[") != -1:
                 bandwidth_combination_set_item_start_index = fileLines[i+1].find("[")
         elif foundStart and fileLines[i].find("[") == bandwidth_combination_set_item_start_index:
-            itemLine = fileLines[i]
-            item = int(itemLine[fileLines[i].find('[') + len('['):fileLines[i].find(']')])
-            bcsList.append("")
+            #itemLine = fileLines[i]
+            #item = int(itemLine[fileLines[i].find('[') + len('['):fileLines[i].find(']')])
+            if fileLines[i+2].find('Binary string (Bin)') == -1:
+                bcsList.append("")
         elif fileLines[i].find('Binary string (Bin) :') != -1:
                 bcsLine = fileLines[i]
                 bcs = bcsLine[fileLines[i].find('Binary string (Bin) :') + len(
