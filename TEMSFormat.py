@@ -13,17 +13,14 @@ modulationList = []
 def parseSupportedBandsV9TEMSFormat(lines):
     bandListV9 = []
     foundV9 = False
-    emptyItem = -1
     for i, bandV9 in enumerate(lines):
         if bandV9.find("supportedBandListEUTRA-v9") != -1:
             foundV9 = True
-        elif foundV9 and bandV9.find("Item") != -1:
-            if emptyItem == 1:
+        elif foundV9 and bandV9.find('[') != -1:
+            bandLine = lines[i+1]
+            if bandLine.find('bandEUTRA-v9') == -1:
                 bandListV9.append("")
-        elif foundV9 and bandV9.find("SupportedBandEUTRA-v9") != -1:
-            emptyItem = 1
         elif foundV9 and bandV9.find("bandEUTRA-v9") != -1:
-            emptyItem = 0
             bandLine = lines[i]
             band = bandLine[lines[i].find(":") + 2:None].replace('\n','')
             bandListV9.append(band)
@@ -74,39 +71,37 @@ def parseBandCombinationV10TEMSFormat(fileLines):
     i = UtilsLib.findstring(fileLines, "SupportedBandCombination-v1090 :")
     while True:
         # ********************************************* INIT *******************************************************************
-        if fileLines[i].find("SupportedBandCombination-v1090 :") != -1:
+        if not foundStart and fileLines[i].find("SupportedBandCombination-v1090 :") != -1:
             foundStart = True
-            if (fileLines[i + 1].find("[") != -1):
+            if fileLines[i + 1].find("[") != -1:
                 band_combination_item_start_index = fileLines[i + 1].find("[")
-                if (fileLines[i + 2].find("BandCombinationParameters-v1090") != -1):
-                    if (fileLines[i + 3].find("[") != -1):
+                if fileLines[i + 2].find("BandCombinationParameters-v1090") != -1:
+                    if fileLines[i + 3].find("[") != -1:
                         band_item_Index = fileLines[i + 3].find("[")
 
         # ********************************************* ITEM *******************************************************************
-        elif foundStart and fileLines[i].find("[") == band_combination_item_start_index:
-            if (subItem != -1): #in case there is no bandEUTRA-v1090, subItem will be different from -1, so, we need to append anyway for consistency
+        elif foundStart and fileLines[i].find('[') == band_combination_item_start_index:
+        # in case there is no bandEUTRA-v1090, subItem will be different from -1, so, we need to append anyway for consistency
+            if subItem != -1:
                 bandCombinationV10List.append(bandCombinationItemList)
-            itemLine = fileLines[i]
-            item = int(itemLine[fileLines[i].find("[") + len("["):None])
             bandCombinationItemListIndex = -1
             bandCombinationItemList = []
             isCombo = False
             subItem = -1
             combo = ""
-        elif foundStart and fileLines[i].find("BandCombinationParameters-v1090") != -1:
-            comboItems = fileLines[i]
-            comboItem = int(comboItems[fileLines[i].find("BandCombinationParameters-v1090") + len("BandCombinationParameters-v1090 : "):fileLines[i].find("item")].replace('\n',''))
-        elif foundStart and fileLines[i].find("Item") == band_item_Index:
+        elif foundStart and fileLines[i].find('[') == band_item_Index:
+            if (fileLines[i + 1].find("bandEUTRA-v1090") != -1 and fileLines[i + 2].find("[") == band_item_Index) or fileLines[i + 1].find("[") == band_item_Index:
+                isCombo = True
+                ComboLine = fileLines[i]
+                comboItem = ComboLine[ComboLine.find('[') + 1: ComboLine.find(']')].replace(' ', '')
             bandObj = {}
             bandCombinationItemList.append(bandObj)
             bandCombinationItemListIndex += 1
             subItem += 1
-            if comboItem > 1:
-                isCombo = True
         # ********************************************* BAND ********************************************************************
         elif foundStart and fileLines[i].find("bandEUTRA-v1090 :") != -1:
             bandLine = fileLines[i]
-            band = bandLine[bandLine.find("bandEUTRA-v1090") + len("bandEUTRA-v1090 : "):None].replace('\n','')
+            band = bandLine[bandLine.find("bandEUTRA-v1090") + len("bandEUTRA-v1090 : "):None].replace('\n', '').replace(' ', '')
             if isCombo:
                 combo = ''.join([combo, " + {}".format(band)]).replace('\n', '')
             else:
@@ -177,7 +172,7 @@ def parseBandCombinationTEMSFormat(fileLines):
         elif foundStart and fileLines[i].find("bandEUTRA-r10 :") != -1:
             #get supported bands
             bandLine = fileLines[i]
-            band = bandLine[bandLine.find("bandEUTRA-r10") + len("bandEUTRA-r10: "):None].replace('\n','')
+            band = bandLine[bandLine.find("bandEUTRA-r10") + len("bandEUTRA-r10: "):None].replace('\n', '').replace(' ', '')
             if band == "64":
                 foundBandCombinationV10 = True
             bandObj = {}
@@ -317,7 +312,7 @@ def parseHighOrderModulationTEMSFormat(lines):
 
 
 #************* Called from main loop. This method will call all other parsers *****************
-def parseTEMSFormat(lines,fileName,country,modelName):
+def parseTEMSFormat(lines,fileName):
     #Parse supported LTE bands
     parseSupportedBandsTEMSFormat(lines)
 
