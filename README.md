@@ -16,7 +16,6 @@ to run, there are two options: command line or using an UI:
    * options available:
        --help    | -h  --> Show help
        --output  | -o  --> Store output file in output folder
-   NOTE: when using -c and -m options, file MUST be provided. It will store all information in DBy
 
 2) python UECapabilityInformationPaser.py
    Running without any parameters will open a window, where one can paste a UECapabilityInformation and click on Parse
