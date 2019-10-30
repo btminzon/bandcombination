@@ -1,4 +1,4 @@
-This script is intended to parse UE Capability Information message, from both Wireshark and Qualcomm format. 
+This script is intended to parse UE Capability Information message, from Wireshark,  Qualcomm and Infovista's TEMS format.
 
 It will extract some information and show an Excel table in a friendly format.
 
@@ -16,8 +16,6 @@ to run, there are two options: command line or using an UI:
    * options available:
        --help    | -h  --> Show help
        --output  | -o  --> Store output file in output folder
-       --country | -c  --> Set Country (to be used with DB)
-       --model   | -m  --> Set Model Name, starting with 'SM-' (to be used with DB)
    NOTE: when using -c and -m options, file MUST be provided. It will store all information in DBy
 
 2) python UECapabilityInformationPaser.py
