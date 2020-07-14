@@ -72,10 +72,12 @@ def convertBCS(Bcs, wiresharkFormat):
     bcs = bcs[:-1].replace(",","|")
     return(bcs)
 
-def findstring(fileLines, string):
-    for i, bandcombination in enumerate(fileLines):
-        if bandcombination.find(string) != -1:
+
+def findstring(fileLines, string, StartingPoint):
+    for i in range(StartingPoint, len(fileLines)):
+        if fileLines[i].find(string) != -1:
             return i
+
 
 def convertInLine(bandCombinationList):
     combinedInfoList = []
