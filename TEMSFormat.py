@@ -8,6 +8,7 @@ layersList = []
 bcsList = []
 bandsList = []
 modulationList = []
+revisionSupport = ''
 
 def parseSupportedBandsV9TEMSFormat(lines):
     bandListV9 = []
@@ -155,7 +156,7 @@ def parseBandCombinationTEMSFormat(fileLines):
                 {'SupportedBandCombination': 'SupportedBandCombination-r10 : ',
                     'bandEUTRA': 'bandEUTRA-r10',
                     'BandParametersUL': 'BandParametersUL-r10',
-                    'supportedMIMO-CapabilityDL': 'SupportedMIMO-CapabilityDL-r10 : ',
+                    'supportedMIMO-CapabilityDL': 'supportedMIMO-CapabilityDL-r10 : ',
                     'ca-BandwidthClassDL': 'ca-BandwidthClassDL-r10 : ',
                     'supportedBandwidthCombinationSet' : 'This item is not available on this revision',
                     'End': 'measParameters-v1020'},
@@ -282,11 +283,10 @@ def parseBandCombinationTEMSFormat(fileLines):
             bandCombinationItemListIndex += 1
 # ************************************** Supported Bandwidth Combination Set *******************************************
         elif fileLines[i].find(bandDic[revisionSupport]['supportedBandwidthCombinationSet']) != -1:
-            bcsLine = fileLines[i+1]
-            bcs = bcsLine[fileLines[i+1].find('Binary string (Bin) : ') + len('Binary string (Bin) :'):].strip()
-            print("Item: " + str(item))
-            print("Size of bcList: " + str(len(bcsList)))
-            bcsList[item] = UtilsLib.convertBCS(bcs, False)
+            if revisionSupport is 'supportedBandCombinationReduced-r13':
+                bcsLine = fileLines[i+1]
+                bcs = bcsLine[fileLines[i+1].find('Binary string (Bin) : ') + len('Binary string (Bin) :'):].strip()
+                bcsList[item] = UtilsLib.convertBCS(bcs, False)
 # ********************************************* END ********************************************************************
         elif fileLines[i].find(bandDic[revisionSupport]['End']) != -1:
             # finish
@@ -302,6 +302,10 @@ def parseBandCombinationTEMSFormat(fileLines):
 
 
 def parseBandwidthCombinationSetTEMSFormat(fileLines):
+
+    # Check the revision. If re13, it was already processed in main loop
+    if revisionSupport is 'supportedBandCombinationReduced-r13':
+        return
 
     i = UtilsLib.findstring(fileLines, "SupportedBandCombinationExt-r10 :")
 
