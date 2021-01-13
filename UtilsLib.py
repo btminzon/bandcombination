@@ -73,10 +73,17 @@ def convertBCS(Bcs, wiresharkFormat):
     return(bcs)
 
 
-def findstring(fileLines, string, StartingPoint):
+def findstring(fileLines, string, StartingPoint = 0):
     for i in range(StartingPoint, len(fileLines)):
         if fileLines[i].find(string) != -1:
             return i
+
+
+def getValue(fileLine, string):
+    itemLine = fileLine
+    item = itemLine[fileLine.find(string) + len(string):None].replace('\n', '')
+    return item
+
 
 
 def convertInLine(bandCombinationList):
