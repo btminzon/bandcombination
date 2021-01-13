@@ -11,9 +11,11 @@ outFile = ""
 createOutDir = False
 isWindows = False
 
+
 def showOption():
     print("   --help    | -h  --> Show this message")
     print("   --output  | -o  --> Store output file in output folder")
+
 
 def showHelp():
     print("\n      UE Capability Information Parser v0.2")
@@ -28,7 +30,8 @@ def showHelp():
 
 if __name__ == '__main__':
     if len(sys.argv) >= 3:
-        for i in range(1,len(sys.argv)-2):
+        i = 1
+        for i in range(1, len(sys.argv)-2):
             option = sys.argv[i]
             if option.startswith("-"):
                 if option.find("--output") != -1 or option.find("-o") != -1:
@@ -57,28 +60,28 @@ if __name__ == '__main__':
         print("Must provide a file while running in command mode. Please try again")
         quit()
 
-    #creates output file with the same name as input
+    # creates output file with the same name as input
     outFile = fileName.replace(".txt", ".xlsx")
-    #determine which OS script is running
+    # determine which OS script is running
     if platform.system() == "Windows":
         isWindows = True
-    #If the file already exists, don't need to run again, but only uses the result
+    # If the file already exists, don't need to run again, but only uses the result
     if isWindows and os.path.isfile("output\\"+outFile):
         print("File exists. No need to run")
         print("End program")
         quit()
-    #Open file as read only
+    # Open file as read only
     file = open(fileName, 'r')
     lines = file.readlines()
     file.close()
 
-    #main program without DB storage
+    # main program
     Parser.readInformation(lines, outFile)
 
-   #If option --output was passed, it will store the output file in the output directory
+    # If option --output was passed, it will store the output file in the output directory
     if createOutDir:
         if platform.system() == "Windows":
-            if os.path.isdir("output\\") == False:
+            if not os.path.isdir("output\\"):
                 os.system("mkdir output")
             os.system("mv " + outFile + " output")
     print("End program")
