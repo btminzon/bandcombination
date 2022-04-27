@@ -1,5 +1,6 @@
 from tkinter.filedialog import *
 from tkinter.scrolledtext import *
+from tkinter import *
 import Parser
 
 class Application(Frame):

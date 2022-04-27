@@ -4,6 +4,7 @@ import platform
 import Window
 import Parser
 
+
 fileName = ""
 file = ""
 outFile = ""
