@@ -71,7 +71,7 @@ class Application(Frame):
         y = self.calcY(win,height)
         win.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
-        label = Label(win, text="UE Capability Information Parser v0.2\n\n"
+        label = Label(win, text="UE Capability Information Parser v0.3\n\n"
                             "Written by Breno T. Minzon - breno.minzon@gmail.com\n\n"
                                 "This application parses UE Capability Information message and creates an Excel\n"
                                 "table with the parsed data")

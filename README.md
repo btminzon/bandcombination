@@ -10,6 +10,7 @@ So far, it is parsing:
 5) Bandwidth Combination Set (BCS)
 6) 256QAM in DL and 64QAM in UL support
 7) B66, LAA and LTE-U bands
+8) NR Bands and NR band combination
 
 to run, there are two options: command line or using an UI:
 1) python UECapabilityInformationPaser.py (option) (UECapabilityInformation file in text format)

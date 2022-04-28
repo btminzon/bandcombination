@@ -34,6 +34,35 @@ def parseSupportedBandsV9TEMSFormat(lines):
             bandsList[i] = bandListV9[i]
 
 
+def parseSupportedNrBandsTEMSFormat(lines, StartingPoint):
+    found = False
+    for i in range(StartingPoint, len(lines)):
+        if lines[i].find("supportedBandListNR :") != -1:
+            found = True
+        elif found and lines[i].find("bandNR :") != -1:
+            bandLine = lines[i]
+            band = bandLine[lines[i].find("bandNR :") + len("bandNR : "):None].replace('\n', '')
+            # append a 'n' on NR band, like n71
+            band = ''.join(('n', band))
+            bandsList.append(band)
+        elif found and lines[i].find("measAndMobParameters") != -1:
+            found = False
+            break
+
+
+def  parseSupportedBandsENDCTEMSFormat(lines, StartingPoint):
+    found = False
+    for i in range(StartingPoint-100, len(lines)):
+        if lines[i].find("supportedBandListEUTRA : ") != -1:
+            found = True
+        elif found and lines[i].find("[") != -1:
+            bandLine = lines[i]
+            band = bandLine[lines[i].find(": ") + len(': '):None].replace('\n', '')
+            bandsList.append(band)
+        elif found and lines[i].find("eutra-ParametersCommon") != -1:
+            found = False
+            break
+
 
 def parseSupportedBandsTEMSFormat(lines, StartingPoint):
     found = False
@@ -47,9 +76,21 @@ def parseSupportedBandsTEMSFormat(lines, StartingPoint):
             if band == "64":
                 foundBandV9 = True
             bandsList.append(band)
-        elif found and lines[i].find("measParameters") != -1:
+        elif lines[i].find("supportedBandListNR :") != -1:
+            found = True
+        elif found and lines[i].find("bandNR :") != -1:
+            bandLine = lines[i]
+            band = bandLine[lines[i].find("bandNR :") + len("bandNR : "):None].replace('\n', '')
+            # append a 'n' on NR band, like n71
+            band = ''.join(('n', band))
+            bandsList.append(band)
+        elif found and lines[i].find("measParameters") != -1: # stopper for LTE
             found = False
             break
+        elif found and lines[i].find("measAndMobParameters") != -1:  # stopper for NR
+            found = False
+            break
+
     # Need to add Band Rel9 (B66, B46, B252, B253, B254 and B255)
     if foundBandV9:
         parseSupportedBandsV9TEMSFormat(lines)
@@ -68,7 +109,6 @@ def parseSupportedBandsTEMSFormat(lines, StartingPoint):
                 bandsList.append(band)
             elif foundBandNR and lines[i].find("featureSetsEUTRA-r15") != -1:
                 foundBandNR = False
-
                 break
 
 def parseBandCombinationV10TEMSFormat(fileLines):
@@ -371,6 +411,21 @@ def parseHighOrderModulationTEMSFormat(lines, StartingPoint):
                 dicMod = {'dl-256QAM-r12': "not informed", 'ul-64QAM-r12': "not informed"}
                 modulationList.append(dicMod)
 
+#FIXME Need to correctly parse this
+def parseHighOrderModulationNrTEMSFormat(lines, StartingPoint):
+    for band in range(len(bandsList)):
+        dicMod = {}
+        dicMod = {'dl-256QAM-r12': "not supported", 'ul-64QAM-r12': "not supported"}
+        modulationList.append(dicMod)
+
+
+#FIXME Need to correctly parse this
+def parseHighOrderModulationENDCTEMSFormat(lines, StartingPoint):
+    for band in range(len(bandsList)):
+        dicMod = {}
+        dicMod = {'dl-256QAM-r12': "not supported", 'ul-64QAM-r12': "not supported"}
+        modulationList.append(dicMod)
+
 
 # ************* This method creates a list containing the RATs available in the logfile in order to parse it
 def parseRAT(fileLines):
@@ -396,15 +451,14 @@ def parseRAT(fileLines):
                 j += 1
 
 
-def parseSupportedBandsEutraNRTEMSFormat(fileLines, StartingPoint):
-
+def parseBandCombinationNrTEMSFormat(fileLines, StartingPoint):
     i = UtilsLib.findstring(fileLines, "BandCombinationList :", StartingPoint)
     if i is None:
         print("No Band Combination found for EN-DC")
         return
 
     foundStart = False
-    rat = ''
+    rat = ""
     rat_band = 'Invalid Initial String'
     item = 0
     band = 0
@@ -430,23 +484,24 @@ def parseSupportedBandsEutraNRTEMSFormat(fileLines, StartingPoint):
                 band_combination_item_start_index = fileLines[i + 1].find("[")
         # ********************************************* ITEM ***********************************************************
         elif foundStart and fileLines[i].find("[") == band_combination_item_start_index:
-            item = int(UtilsLib.getValue(fileLines[i], '[').replace(']', '').replace(': ', '').replace(' ', ''))
+            item = int(UtilsLib.getValue(fileLines[i], '[').replace(']', '').replace(': ', ''))
         # ********************************************* BAND ***********************************************************
         elif foundStart and fileLines[i].find('BandParameters :') != -1:
             # get RAT
-            rat = UtilsLib.getValue(fileLines[i], 'BandParameters :')
-            rat_band = 'bandEUTRA : ' if rat == 'eutra' else 'bandNR : '
+            rat = UtilsLib.getValue(fileLines[i], 'BandParameters : ')
+            if rat == 'eutra':
+                rat_band = 'bandEUTRA : '
+            elif rat == 'nr':
+                rat_band = 'bandNR : '
         # **************************************************************************************************************
-        elif foundStart and fileLines[i].find(rat_band):
+        elif foundStart and fileLines[i].find(rat_band) != -1:
             band = UtilsLib.getValue(fileLines[i], rat_band)
             # Whenever band is a NR one, add a 'n' in the end to indicate
             if rat == 'nr':
-                band = ''.join((band, 'n'))
-            # Not sure if it will be necessary
-            # if band == "64":
-            #    foundBandCombinationV10 = True
+                band = ''.join(('n', band))
             bandObj = {}
             if item != previousItem:
+                bcsList.append("") #FIXME: We need to parse correctly BCS or ignore it.
                 # new Item found
                 if combo != "":
                     bandCombinationList.append(bandCombinationItemList)
@@ -467,7 +522,7 @@ def parseSupportedBandsEutraNRTEMSFormat(fileLines, StartingPoint):
             bandCombinationItemList.append(bandObj)
             bandCombinationItemList[bandCombinationItemListIndex]['Band'] = band
             bandCombinationItemList[bandCombinationItemListIndex]['Item'] = item
-            if fileLines[i + 4].find('ca-BandwidthClassUL-') != -1:
+            if fileLines[i + 1].find('ca-BandwidthClassUL-') != -1:
                 hasUplink = True
                 bandCombinationItemList[bandCombinationItemListIndex]['HasUplink'] = True
                 bandCombinationUplinkList.append(True)
@@ -475,10 +530,11 @@ def parseSupportedBandsEutraNRTEMSFormat(fileLines, StartingPoint):
                 hasUplink = False
                 bandCombinationUplinkList.append(False)
         # ********************************************* MIMO ***********************************************************
-        if fileLines[1].find('ca-BandwidthClassDL-EUTRA : ' if rat == 'eutra' else 'ca-BandwidthClassDL-NR : ') != -1:
+        if fileLines[i].find('ca-BandwidthClassDL-EUTRA : ' if rat == 'eutra' else 'ca-BandwidthClassDL-NR : ') != -1:
             # get bandwidth class
             bwClass = UtilsLib.getValue(fileLines[i], 'ca-BandwidthClassDL-EUTRA : ' if rat == 'eutra' else 'ca-BandwidthClassDL-NR : ')
             bandCombinationItemList[bandCombinationItemListIndex]['BwClass'] = bwClass
+            bandCombinationItemList[bandCombinationItemListIndex]['SupportedMIMOLayers'] = '2x2'  # FIXME
             mimo = '' #FIXME
             if isCombo:
                 if hasUplink:
@@ -499,14 +555,7 @@ def parseSupportedBandsEutraNRTEMSFormat(fileLines, StartingPoint):
             mimoListIndex += 1
             layers = UtilsLib.calculateLayers(layers, mimo, bwClass)
             bandCombinationItemListIndex += 1
-        # ************************************** Supported Bandwidth Combination Set *******************************************
-        # elif fileLines[i].find(bandDic[revisionSupport]['supportedBandwidthCombinationSet']) != -1:
-        #    if revisionSupport == 'supportedBandCombinationReduced-r13':
-        #        bcsLine = fileLines[i + 1]
-        #        bcs = bcsLine[fileLines[i + 1].find('Binary string (Bin) : ') + len('Binary string (Bin) :'):].strip()
-            bcsList[item] = ''
-        # ********************************************* END ********************************************************************
-        elif fileLines[i].find('Message dump (Hex):') == 0:
+        elif fileLines[i].find('appliedFreqBandListFilter') != -1:
             # finish
             bandCombinationList.append(bandCombinationItemList)
             bcUplinkList.append(bandCombinationUplinkList)
@@ -534,13 +583,26 @@ def parseTEMSEutra(filelines, StartingPoint):
 
 
 def parseTEMSEutraNr(fileLines, StartingPoint):
-    # Parse supported LTE + NR Band combination
-    parseSupportedBandsEutraNRTEMSFormat(fileLines, StartingPoint)
+    # Parse supported LTE bands
+    parseSupportedBandsENDCTEMSFormat(fileLines, StartingPoint)
 
+    # Parse support for 256QAM in DL and 64QAM in UL
+    parseHighOrderModulationENDCTEMSFormat(fileLines, StartingPoint)
+
+def parseTEMSNr(filelines, StartingPoint):
+    # Parse supported NR band combination
+    parseSupportedNrBandsTEMSFormat(filelines, StartingPoint)
+
+    # Parse supported band combination
+    parseBandCombinationNrTEMSFormat(filelines, StartingPoint)
+
+    # Parse support for 256QAM in DL and 64QAM in UL
+    #parseHighOrderModulationNrTEMSFormat(filelines, StartingPoint)
 
 # ************* Called from main loop. This method will call all other parsers *****************
 def parseTEMSFormat(lines, fileName):
     # iterate through logfile to process all different RAT
+    nr_flag = False
     parseRAT(lines)
     for rat in ratList:
         if rat['Rat'] == 'eutra':
@@ -550,9 +612,11 @@ def parseTEMSFormat(lines, fileName):
             print('EN-DC found.')
             parseTEMSEutraNr(lines, rat['StartingPoint'])
         elif rat['Rat'] == 'nr':
-            print("NR/SA found. TODO: Need to implement")
+            print("NSA/SA found")
+            nr_flag = True
+            parseTEMSNr(lines, rat['StartingPoint'])
         elif rat['Rat'] == 'utra':
             print('UTRA found. Nothing to do here')
 
     # Write table on Excel
-    ExcelHandler.write2Excel(bandsList, bandCombinationList, layersList, bcsList, modulationList, fileName)
+    ExcelHandler.write2Excel(bandsList, bandCombinationList, layersList, bcsList, modulationList, fileName, nr_flag)
