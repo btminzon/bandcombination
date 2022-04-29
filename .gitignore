@@ -6,4 +6,6 @@ output/*
 __pycache__/*
 UECapabilityInformatio*.txt
 cmd.exe.lnk
+*.spec
+
 
