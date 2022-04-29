@@ -22,4 +22,6 @@ to run, there are two options: command line or using an UI:
    Running without any parameters will open a window, where one can paste a UECapabilityInformation and click on Parse
    button to parse. It will generate UeCapabilityInformation.xlsx as output
 
+3) Download and execute the .exe (Windows only).
+
 Any comment or suggestion, feel free to contact me or create a new branch with the changes!
