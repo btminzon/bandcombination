@@ -1,11 +1,8 @@
 .idea/*
-build/*
-dist/*
-output/*
+Source/build/*
+Source/dist/*
+Source/output/*
 *.xlsx
 __pycache__/*
-UECapabilityInformatio*.txt
 cmd.exe.lnk
 *.spec
-
-
