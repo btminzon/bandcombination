@@ -11,6 +11,7 @@ modulationList = []
 ratList = []
 revisionSupport = ''
 
+
 def parseSupportedBandsV9TEMSFormat(lines):
     bandListV9 = []
     foundV9 = False
@@ -23,12 +24,11 @@ def parseSupportedBandsV9TEMSFormat(lines):
                 bandListV9.append("")
         elif foundV9 and bandV9.find("bandEUTRA-v9") != -1:
             bandLine = lines[i]
-            band = bandLine[lines[i].find(":") + 2:None].replace('\n','')
+            band = bandLine[lines[i].find(":") + 2:None].replace('\n', '')
             bandListV9.append(band)
         elif foundV9 and bandV9.find("nonCriticalExtension") != -1:
-            foundV9 = False
             break
-    #Concatenate both supportedBandListEUTRA and supportedBandListEUTRA-v9, replacing  B64 by v9 one
+    # Concatenate both supportedBandListEUTRA and supportedBandListEUTRA-v9, replacing  B64 by v9 one
     for i, (j, k) in enumerate(zip(bandsList, bandListV9)):
         if k != "":
             bandsList[i] = bandListV9[i]
@@ -46,11 +46,10 @@ def parseSupportedNrBandsTEMSFormat(lines, StartingPoint):
             band = ''.join(('n', band))
             bandsList.append(band)
         elif found and lines[i].find("measAndMobParameters") != -1:
-            found = False
             break
 
 
-def  parseSupportedBandsENDCTEMSFormat(lines, StartingPoint):
+def parseSupportedBandsENDCTEMSFormat(lines, StartingPoint):
     found = False
     for i in range(StartingPoint-100, len(lines)):
         if lines[i].find("supportedBandListEUTRA : ") != -1:
@@ -60,7 +59,6 @@ def  parseSupportedBandsENDCTEMSFormat(lines, StartingPoint):
             band = bandLine[lines[i].find(": ") + len(': '):None].replace('\n', '')
             bandsList.append(band)
         elif found and lines[i].find("eutra-ParametersCommon") != -1:
-            found = False
             break
 
 
@@ -84,11 +82,9 @@ def parseSupportedBandsTEMSFormat(lines, StartingPoint):
             # append a 'n' on NR band, like n71
             band = ''.join(('n', band))
             bandsList.append(band)
-        elif found and lines[i].find("measParameters") != -1: # stopper for LTE
-            found = False
+        elif found and lines[i].find("measParameters") != -1:  # stopper for LTE
             break
         elif found and lines[i].find("measAndMobParameters") != -1:  # stopper for NR
-            found = False
             break
 
     # Need to add Band Rel9 (B66, B46, B252, B253, B254 and B255)
@@ -108,18 +104,16 @@ def parseSupportedBandsTEMSFormat(lines, StartingPoint):
                 band = ''.join((band, 'n'))
                 bandsList.append(band)
             elif foundBandNR and lines[i].find("featureSetsEUTRA-r15") != -1:
-                foundBandNR = False
                 break
 
+
 def parseBandCombinationV10TEMSFormat(fileLines):
-    item = 0
     comboItem = 0
     foundStart = False
     combo = ""
     isCombo = False
     band_combination_item_start_index = -1
     band_item_Index = -1
-    bandObj = {}
     bandCombinationItemList = []
     bandCombinationV10List = []
     bandCombinationItemListIndex = 0
@@ -158,7 +152,8 @@ def parseBandCombinationV10TEMSFormat(fileLines):
         # ********************************************* BAND ***********************************************************
         elif foundStart and fileLines[i].find("bandEUTRA-v1090 :") != -1:
             bandLine = fileLines[i]
-            band = bandLine[bandLine.find("bandEUTRA-v1090") + len("bandEUTRA-v1090 : "):None].replace('\n', '').replace(' ', '')
+            band = bandLine[bandLine.find("bandEUTRA-v1090") +
+                            len("bandEUTRA-v1090 : "):None].replace('\n', '').replace(' ', '')
             if isCombo:
                 combo = ''.join([combo, " + {}".format(band)]).replace('\n', '')
             else:
@@ -171,20 +166,19 @@ def parseBandCombinationV10TEMSFormat(fileLines):
         elif fileLines[i].find("nonCriticalExtension") != -1:
             # finish
             bandCombinationV10List.append(bandCombinationItemList)
-            foundStart = False
             break
         i += 1
     # Need to change order of PCC, as it is already changed in bandCombinationList
     for i, (bcListv10, uplinkOrderList) in enumerate(zip(bandCombinationV10List, bcUplinkList)):
-        for j, (bcV10, uplinkList) in enumerate(zip(bcListv10,uplinkOrderList)):
-            if j != 0 and uplinkList == True:
+        for j, (bcV10, uplinkList) in enumerate(zip(bcListv10, uplinkOrderList)):
+            if j != 0 and uplinkList is True:
                 temp = bcListv10[0]
                 bcListv10[0] = bcListv10[j]
                 bcListv10[j] = temp
 
     # Concatenate both supportedBandListEUTRA and supportedBandListEUTRA-v9, replacing  B64 by v9 one
-    for bcList, bcListv10 in zip(bandCombinationList,bandCombinationV10List):
-        for bc, bcV10 in zip(bcList,bcListv10):
+    for bcList, bcListv10 in zip(bandCombinationList, bandCombinationV10List):
+        for bc, bcV10 in zip(bcList, bcListv10):
             if bc['Band'] == "64":
                 if 'Band' in bcV10 and bcV10['Band'] != int(0):
                     bc['Band'] = bcV10['Band']
@@ -199,7 +193,7 @@ def parseBandCombinationTEMSFormat(fileLines, StartingPoint):
                     'BandParametersUL': 'BandParametersUL-r10',
                     'supportedMIMO-CapabilityDL': 'supportedMIMO-CapabilityDL-r10 : ',
                     'ca-BandwidthClassDL': 'ca-BandwidthClassDL-r10 : ',
-                    'supportedBandwidthCombinationSet' : 'This item is not available on this revision',
+                    'supportedBandwidthCombinationSet': 'This item is not available on this revision',
                     'End': 'measParameters-v1020'},
                'supportedBandCombinationReduced-r13':
                    {'SupportedBandCombination': 'SupportedBandCombinationReduced-r13 : ',
@@ -207,7 +201,7 @@ def parseBandCombinationTEMSFormat(fileLines, StartingPoint):
                     'BandParametersUL': 'BandParametersUL-r13',
                     'supportedMIMO-CapabilityDL': 'supportedMIMO-CapabilityDL-r13 : ',
                     'ca-BandwidthClassDL': 'ca-BandwidthClassDL-r13 : ',
-                    'supportedBandwidthCombinationSet' : 'supportedBandwidthCombinationSet-r13',
+                    'supportedBandwidthCombinationSet': 'supportedBandwidthCombinationSet-r13',
                     'End': 'measParameters-v1310'}
                }
     # Check which 3GPP revision is been used, and if none, return
@@ -230,10 +224,8 @@ def parseBandCombinationTEMSFormat(fileLines, StartingPoint):
     band_combination_item_start_index = -1
     layers = 0
     mimoList = []
-    bwClass = ""
     hasUplink = False
     mimoListIndex = 0
-    bandObj = {}
     bandCombinationItemList = []
     bandCombinationUplinkList = []
     bandCombinationItemListIndex = 0
@@ -242,7 +234,7 @@ def parseBandCombinationTEMSFormat(fileLines, StartingPoint):
         # ********************************************* INIT ***********************************************************
         if fileLines[i].find(bandDic[revisionSupport]['SupportedBandCombination']) != -1:
             foundStart = True
-            if (fileLines[i+1].find("[") != -1):
+            if fileLines[i + 1].find("[") != -1:
                 band_combination_item_start_index = fileLines[i+1].find("[")
         # ********************************************* ITEM ***********************************************************
         elif foundStart and fileLines[i].find("[") == band_combination_item_start_index:
@@ -308,7 +300,7 @@ def parseBandCombinationTEMSFormat(fileLines, StartingPoint):
                         mimoList.insert(mimoListIndex-1, mimo)
                         bandCombinationItemList[bandCombinationItemListIndex]['HasUplink'] = True
                         temp = bandCombinationItemList[bandCombinationItemListIndex]                        #
-                        bandCombinationItemList[bandCombinationItemListIndex] = bandCombinationItemList[0]  #Swap Uplink
+                        bandCombinationItemList[bandCombinationItemListIndex] = bandCombinationItemList[0]  # Swap UL
                         bandCombinationItemList[0] = temp                                                   #
                     else:
                         combo = ''.join([combo, " + {}{}".format(band, bwClass.upper())]).replace('\n', '')
@@ -332,7 +324,6 @@ def parseBandCombinationTEMSFormat(fileLines, StartingPoint):
             bandCombinationList.append(bandCombinationItemList)
             bcUplinkList.append(bandCombinationUplinkList)
             layersList.append(layers)
-            foundStart = False
             break
         i += 1
     # Handle supportedBandCombination-v1090
@@ -368,10 +359,9 @@ def parseBandwidthCombinationSetTEMSFormat(fileLines, StartingPoint):
             if fileLines[i+2].find('Binary string (Bin)') == -1:
                 bcsList.append("")
         elif fileLines[i].find('Binary string (Bin) :') != -1:
-                bcsLine = fileLines[i]
-                bcs = bcsLine[fileLines[i].find('Binary string (Bin) :') + len(
-                    'Binary string (Bin) : '):]
-                bcsList.append(UtilsLib.convertBCS(bcs, False))
+            bcsLine = fileLines[i]
+            bcs = bcsLine[fileLines[i].find('Binary string (Bin) :') + len('Binary string (Bin) : '):]
+            bcsList.append(UtilsLib.convertBCS(bcs, False))
         elif fileLines[i].find('nonCriticalExtension') != -1:
             break
         i += 1
@@ -411,44 +401,40 @@ def parseHighOrderModulationTEMSFormat(lines, StartingPoint):
                 dicMod = {'dl-256QAM-r12': "not informed", 'ul-64QAM-r12': "not informed"}
                 modulationList.append(dicMod)
 
-#FIXME Need to correctly parse this
+
+# FIXME Need to correctly parse this
 def parseHighOrderModulationNrTEMSFormat(lines, StartingPoint):
     for band in range(len(bandsList)):
-        dicMod = {}
         dicMod = {'dl-256QAM-r12': "not supported", 'ul-64QAM-r12': "not supported"}
         modulationList.append(dicMod)
 
 
-#FIXME Need to correctly parse this
+# FIXME Need to correctly parse this
 def parseHighOrderModulationENDCTEMSFormat(lines, StartingPoint):
     for band in range(len(bandsList)):
-        dicMod = {}
         dicMod = {'dl-256QAM-r12': "not supported", 'ul-64QAM-r12': "not supported"}
         modulationList.append(dicMod)
 
 
 # ************* This method creates a list containing the RATs available in the logfile in order to parse it
 def parseRAT(fileLines):
-    rat_type = ''
-    rat_type_index = ''
-    rat_item = 0
     i = UtilsLib.findstring(fileLines, "UE-CapabilityRAT-ContainerList :", 0)
     if i is None:
         print("Error - No UE-CapabilityRAT-ContainerList found in TEMS format.")
         return
     if fileLines[i + 1].find('[') != -1:
-            rat_type_index = fileLines[i + 1].find("[")
-            j = i + 1
-            # Iterate through all file and store the rat into ratList to be processed later
-            while fileLines[j] != '':
-                if fileLines[j].find('[') == rat_type_index:
-                    itemLine = fileLines[j]
-                    rat_item = int(itemLine[fileLines[j].find("[") + len("["):None].replace(']', '').replace(': ', ''))
-                    ratLine = fileLines[j + 1]
-                    rat_type = ratLine[fileLines[j + 1].find('RAT Type : ') + len('RAT Type : '):None]
-                    ratDic = {'StartingPoint': j + 1, 'Item': rat_item, 'Rat': rat_type}
-                    ratList.append(ratDic)
-                j += 1
+        rat_type_index = fileLines[i + 1].find("[")
+        j = i + 1
+        # Iterate through all file and store the rat into ratList to be processed later
+        while fileLines[j] != '':
+            if fileLines[j].find('[') == rat_type_index:
+                itemLine = fileLines[j]
+                rat_item = int(itemLine[fileLines[j].find("[") + len("["):None].replace(']', '').replace(': ', ''))
+                ratLine = fileLines[j + 1]
+                rat_type = ratLine[fileLines[j + 1].find('RAT Type : ') + len('RAT Type : '):None]
+                ratDic = {'StartingPoint': j + 1, 'Item': rat_item, 'Rat': rat_type}
+                ratList.append(ratDic)
+            j += 1
 
 
 def parseBandCombinationNrTEMSFormat(fileLines, StartingPoint):
@@ -468,14 +454,11 @@ def parseBandCombinationNrTEMSFormat(fileLines, StartingPoint):
     band_combination_item_start_index = -1
     layers = 0
     mimoList = []
-    bwClass = ""
     hasUplink = False
     mimoListIndex = 0
-    bandObj = {}
     bandCombinationItemList = []
     bandCombinationUplinkList = []
     bandCombinationItemListIndex = 0
-    foundBandCombinationV10 = False
     while True:
         # ********************************************* INIT ***********************************************************
         if fileLines[i].find('BandCombinationList :') != -1:
@@ -501,7 +484,7 @@ def parseBandCombinationNrTEMSFormat(fileLines, StartingPoint):
                 band = ''.join(('n', band))
             bandObj = {}
             if item != previousItem:
-                bcsList.append("") #FIXME: We need to parse correctly BCS or ignore it.
+                bcsList.append("")  # FIXME: We need to parse correctly BCS or ignore it.
                 # new Item found
                 if combo != "":
                     bandCombinationList.append(bandCombinationItemList)
@@ -532,10 +515,11 @@ def parseBandCombinationNrTEMSFormat(fileLines, StartingPoint):
         # ********************************************* MIMO ***********************************************************
         if fileLines[i].find('ca-BandwidthClassDL-EUTRA : ' if rat == 'eutra' else 'ca-BandwidthClassDL-NR : ') != -1:
             # get bandwidth class
-            bwClass = UtilsLib.getValue(fileLines[i], 'ca-BandwidthClassDL-EUTRA : ' if rat == 'eutra' else 'ca-BandwidthClassDL-NR : ')
+            bwClass = UtilsLib.getValue(fileLines[i],
+                                    'ca-BandwidthClassDL-EUTRA : ' if rat == 'eutra' else 'ca-BandwidthClassDL-NR : ')
             bandCombinationItemList[bandCombinationItemListIndex]['BwClass'] = bwClass
-            bandCombinationItemList[bandCombinationItemListIndex]['SupportedMIMOLayers'] = '2x2'  # FIXME
-            mimo = '' #FIXME
+            bandCombinationItemList[bandCombinationItemListIndex]['SupportedMIMOLayers'] = 'twoLayers'  # FIXME
+            mimo = ''  # FIXME
             if isCombo:
                 if hasUplink:
                     # this is the main band, as contains UL
@@ -560,12 +544,8 @@ def parseBandCombinationNrTEMSFormat(fileLines, StartingPoint):
             bandCombinationList.append(bandCombinationItemList)
             bcUplinkList.append(bandCombinationUplinkList)
             layersList.append(layers)
-            foundStart = False
             break
         i += 1
-        # Handle supportedBandCombination-v1090
-    #if foundBandCombinationV10:
-    #    parseBandCombinationV10TEMSFormat(fileLines)
 
 
 def parseTEMSEutra(filelines, StartingPoint):
@@ -589,6 +569,7 @@ def parseTEMSEutraNr(fileLines, StartingPoint):
     # Parse support for 256QAM in DL and 64QAM in UL
     parseHighOrderModulationENDCTEMSFormat(fileLines, StartingPoint)
 
+
 def parseTEMSNr(filelines, StartingPoint):
     # Parse supported NR band combination
     parseSupportedNrBandsTEMSFormat(filelines, StartingPoint)
@@ -597,7 +578,8 @@ def parseTEMSNr(filelines, StartingPoint):
     parseBandCombinationNrTEMSFormat(filelines, StartingPoint)
 
     # Parse support for 256QAM in DL and 64QAM in UL
-    #parseHighOrderModulationNrTEMSFormat(filelines, StartingPoint)
+    # parseHighOrderModulationNrTEMSFormat(filelines, StartingPoint)
+
 
 # ************* Called from main loop. This method will call all other parsers *****************
 def parseTEMSFormat(lines, fileName):
