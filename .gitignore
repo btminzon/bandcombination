@@ -4,5 +4,6 @@ Source/dist/*
 Source/output/*
 *.xlsx
 __pycache__/*
+Source/__pycache__/
 cmd.exe.lnk
 *.spec
