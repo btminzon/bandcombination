@@ -2,7 +2,7 @@
 import xlsxwriter
 
 
-def writeBandOnFile(workbook, bandsList, modulationList, nr_flag):
+def writeBandOnFile(workbook, bandsList, modulationList, nr_flag=False):
     # Add a worksheet to Excel file
     BandWorksheet = workbook.add_worksheet('Band Info')
 
@@ -48,7 +48,7 @@ def writeBandOnFile(workbook, bandsList, modulationList, nr_flag):
     BandWorksheet.set_column(3, 3, 16, None, {'hidden': nr_flag})
 
 
-def writeBandCombinationOnFile(workbook, bandCombinationList, layersList, bcsList, nr_flag):
+def writeBandCombinationOnFile(workbook, bandCombinationList, layersList, bcsList, nr_flag=False):
 
     # No Carrier Aggregation Support
     if bandCombinationList == ["None"]:
@@ -142,7 +142,7 @@ def writeBandCombinationOnFile(workbook, bandCombinationList, layersList, bcsLis
                         "* For BCS information, please check 36.301-Rel15 tables 5.6A.1-1 and  5.6A.1-2", noteFormat)
 
 
-def write2Excel(bandsList, bandCombinationList, layersList, bcsList, modulationList, file, nr_flag):
+def write2Excel(bandsList, bandCombinationList, layersList, bcsList, modulationList, file, nr_flag=False):
     # filename
     workbook = xlsxwriter.Workbook(file)
 
