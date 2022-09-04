@@ -105,7 +105,7 @@ def writeBandCombinationOnFile(workbook, bandCombinationList, layersList, bcsLis
                     BandCombinationWorksheet.merge_range(row, col + 5, row + len(items) - 1, col + 5,
                                                   "ALL" if bcsList[ItemIndex] == "" else bcsList[ItemIndex], cellFormat)
                     notMerged = False
-                elif len(items) is 1:
+                elif len(items) == 1:
                     BandCombinationWorksheet.write(row, col, bandCombinationObject['Item'], itemCellFormat)
                     BandCombinationWorksheet.write(row, col + 4, layersList[ItemIndex], cellFormat)
                     BandCombinationWorksheet.write(row, col + 5,
